@@ -1,9 +1,9 @@
 %% Figure 3 (PANEL A)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First open data structure, with variable name "summary"
-
+close all
 clearvars -except summary
 warning('off') 
-figure
+figure('Name', 'Panel A')
 hold on
 counta = 1;
 % for i = [3, 7, 12]% this is for the last figure 
@@ -11,16 +11,18 @@ counta = 1;
 for i = [12, 14, 3]
 clearvars -except summary i counta slopeval_holding yintercept_holding pvalue_holding rsquared_holding mean_MSD_from_hist x_save y_save
 [M, F] = mode(summary(i).line_time);
-mode_restriction = summary(i).line_time == M;
+% Over the course of this project, the line-time changes (this happened
+% most frequently at the start, which means I can't average all the traces
+% instead i can only average ones with the same line-time, for this reason
+% I find the most often occuring line-time in the data set and present the
+% mean of this data. 
+mode_restriction = summary(i).line_time == M; 
 if i ~=12
     fit_restriction = and(summary(i).pvalue<0.05, summary(i).rsquared>0.8);
 else
     fit_restriction = mode_restriction;
 end
-
 n = sum(and(mode_restriction, fit_restriction));
-
-
 MSDs_interest = {};
 MSDs_interest = summary(i).MSDs(and(mode_restriction, fit_restriction));
 mean_MSD_from_hist(counta) = mean(summary(i).dcoef(and(mode_restriction, fit_restriction)));
@@ -30,8 +32,6 @@ for loop_var = 1:length(MSDs_interest)
         y{j, loop_var} = MSDs_interest{loop_var}(j,2);
     end
 end
-
-
 for loop_var = 1:size(x,1) 
     c = 1;
     for j = 1:size(x,2)
@@ -42,8 +42,6 @@ for loop_var = 1:size(x,1)
         end
     end
 end
-
-
 for loop_var = 1:size(xx,1) 
     xxx = [];
     yyy = [];
@@ -63,13 +61,9 @@ for loop_var = 1:size(xx,1)
     yl(loop_var) = length(yyy);
 end
 yl = yl';
-
     x_save{counta} = xm;
     y_save{counta} = ym;
-
 D = summary(i).meanD;
-% D = 0.0339952350398447;
-
 if i == 3
     coloris = 'g';
 elseif i == 7
@@ -79,23 +73,21 @@ elseif i == 12
 else 
     coloris = 'm';
 end
-% if i ~= 12
     shadedErrorBar(xm, ym, ys, 'lineProps', coloris)
-%     errorbar(xm, ym, ys,'DisplayName', strcat(summary(i).condition, ' n = ', num2str(n)))
     xm = xm';
     ym = ym';
     fittypeis = strcat('2*', num2str(D), '*x^alpha+c');
-%     fittypeis = '2*0.0339952350398447*x^alpha+c';
     fit_plot = fit(xm(xm<=2), ym(xm<=2), fittype(fittypeis));
     p12 = predint(fit_plot,xm,0.95,'observation','on');
     plot(fit_plot)
     plot(xm,p12,'m--')
-% else 
-%     shadedErrorBar(xm, ym, ys, 'lineProps', coloris)
-% end
-
 xlabel('time')
 ylabel('MSD')
+
+xisthis = xm(xm<=2);
+yisthis = ym(xm<=2);
+semisthis = ys(xm<=2)';
+
 disp(strcat(summary(i).condition, ' has n = ', num2str(n), ' molecules',...
     ' and has an alpha of =', num2str(fit_plot.alpha)))
 end
@@ -106,31 +98,42 @@ ylim([0 y_upperlim])
 xlim([0 2])
 
 %% (Panel B) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure
+figure('Name', 'Panel B')
+
+xy = {};
 clearvars -except summary
 for i = [3, 14, 12]
-    clear B I time 
-    time = cellfun(@length, summary(i).tracking).*summary(i).line_time/1000;
-    time = time(summary(i).bool_kept);
-    [B, I] =  sort(time, 'descend');
-    [val,idx]=min(abs(B-summary(i).t_half/2));
     if i == 3
-    for j = idx+1:idx+10
-        plot(summary(i).tracking{I(j)}(:,1)*summary(i).line_time(I(j))/1000, (summary(i).tracking{I(j)}(:,2)-summary(i).tracking{I(j)}(1,2))*0.1, 'red')
-        hold on
-    end
+        coloris = 'red';
     elseif i == 14
+        coloris = 'blue';
+    elseif i == 12;
+        coloris = 'black';
+    end
+    tempval = [];
+    lengthtime = [];
+    trackkept = summary(i).tracking(and(summary(i).bool_kept, summary(i).outlier_exclusion));
+    linetimeskept = summary(i).line_time(and(summary(i).bool_kept, summary(i).outlier_exclusion));
+    tempval = cellfun(@length, trackkept);
+    for j = 1:length(linetimeskept)
+    lengthtime(j) = tempval(j)*linetimeskept(j)/1000;
+    end
+    tracks = {};
+    line_time = [];
+    tracks = trackkept(lengthtime>8);
+    line_time = linetimeskept(lengthtime>8);
+    % Seed the random number generator
+    rng(4)
+    randis = randperm(length(tracks));
     for j = 1:10
-        plot(summary(i).tracking{I(j)}(:,1)*summary(i).line_time(I(j))/1000, (summary(i).tracking{I(j)}(:,2)-summary(i).tracking{I(j)}(1,2))*0.1, 'blue')
-        hold on
-    end
-    elseif i == 12
-    for j = 1:10
-        plot(summary(i).tracking{I(j)}(:,1)*summary(i).line_time(I(j))/1000, (summary(i).tracking{I(j)}(:,2)-summary(i).tracking{I(j)}(1,2))*0.1, 'black')
-        hold on
-    end
-    end
-%     hold off
+    plot(tracks{randis(j)}(:,1)*line_time(randis(j))/1000, (tracks{randis(j)}(:,2)-tracks{randis(j)}(1,2))*0.1, coloris)
+    x = []; y = [];
+    x = tracks{randis(j)}(:,1)*line_time(randis(j))/1000;
+    y = (tracks{randis(j)}(:,2)-tracks{randis(j)}(1,2))*0.1;
+    xy{i}{j} = [x(x<8), y(x<8)];
+    hold on
+%     pause
+    end  
     ylim([-2 2])
     xlim([0 8])
 end
@@ -139,7 +142,7 @@ title('Figure 3: Panel B')
 
 
 %% (Panel C) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+disp(newline)
 % Part 1: Exclusion and Outlier Criteria Data refinement
 clearvars -except summary
 for i = 1:length(summary)
@@ -163,25 +166,24 @@ for i = 1:length(summary)
     summary(i).errorMedian_thresh = (std(dcoef(outlier_exclusion))/sqrt(length(dcoef(outlier_exclusion))))*sqrt(pi/2);
 
 end
-
+forcsv = {};
 
 % each histogram sepately - used Adobe Illustrator to stack 
-for i = [14, 3, 13, 4, 12]
-    figure
+for i = [14, 3, 13, 4]
+    figure('Name', 'Panel C')
+
     histogram(summary(i).dcoef(and(summary(i).outlier_exclusion, summary(i).bool_kept)),20, 'Normalization', 'probability', 'BinLimits', [0 0.14])
-    title(summary(i).condition)
-    disp(sum(and(summary(i).outlier_exclusion, summary(i).bool_kept)))
+    forcsv{i} = summary(i).dcoef(and(summary(i).outlier_exclusion, summary(i).bool_kept))';
+    title('Figure 3: Panel C')
+    subtitle(summary(i).condition)
+    disp(strcat(summary(i).condition, ' n = ', num2str(sum(and(summary(i).outlier_exclusion, summary(i).bool_kept)))));
 end
     
-    
+    hold off
 %% Panel D  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clearvars -except summary
-% semmean_newexcl1 = [SWR1_stats.semmean_newexcl].';
-% meanD_newexcl1 = [SWR1_stats.meanD_newexcl].';
-% medianis = meanD_newexcl1;
-% erroris = semmean_newexcl1;
+figure('Name', 'Panel D')
 
-figure
 Median_thresh = [summary.Median_thresh].';
 errorMedian_thresh = [summary.errorMedian_thresh].';
 medianis = Median_thresh;
@@ -198,7 +200,7 @@ noATPe = erroris(14);
 ADPe = erroris(4);
 dCas9e =erroris(12);
 
-figure
+
 x = [1, 2, 3, 4, 5];
 y = [dCas9m,noATPm, ADPm, ATPm,ATPgsm];
 SEM = [dCas9e,noATPe, ADPe, ATPe,ATPgse];
@@ -208,33 +210,41 @@ set(gca,'xtick',[1:6],'xticklabel',names)
 xlim([0 5])
 ylim([0 0.05])
 title('Panel D')
+hold off
 %%  Mann-Whitney Median Test 
 ATP_i = 3;
 ADP_i = 4;
 ATPgamms_i = 13;
 noATP_i = 14;
 dcas9i = 12;
+disp(newline)
+pairs = [12, 14; 14, 4; 14, 3; 3, 13];
+prediction = {'****'; 'n.s.'; '****';'n.s.'};
 
-conditionone = 14;
-conditiontwo = 3;
-
-one = summary(conditionone).dcoef(and(summary(conditionone).bool_kept,summary(conditionone).outlier_exclusion));%ATP
-two = summary(conditiontwo).dcoef(and(summary(conditiontwo).bool_kept,summary(conditiontwo).outlier_exclusion));%ATP
+for i = 1:size(pairs, 1)
+one = summary(pairs(i, 1)).dcoef(and(summary(pairs(i, 1)).bool_kept,summary(pairs(i, 1)).outlier_exclusion));%ATP
+two = summary(pairs(i, 2)).dcoef(and(summary(pairs(i, 2)).bool_kept,summary(pairs(i, 2)).outlier_exclusion));%ATP
 [p,h,stats] = ranksum(one, two);
-disp(['p = ', num2str(p)])
-disp(['h = ', num2str(h)])
+pis = ['p = ', num2str(p)];
+his = ['h = ', num2str(h)];
 
+disp(strcat(summary(pairs(i, 1)).condition, ' and ', summary(pairs(i, 2)).condition, ...
+    ' have a null test score of ', his, ' with a significance of: ', pis))
+disp(strcat('matching the reported: ',prediction{i}))
+
+end
 
 
 %% Panel E %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure('Name', 'Panel E')
 
-%% Histcounts to determine which percentage of population is is very slow to stationary phase 
+% Histcounts to determine which percentage of population is is very slow to stationary phase 
 max = 0.14;
 min = 0;
 bins = 20;
 type_of_plot = 'pdf';
 type_style = 'stairs';
-
+disp(newline)
 for i = 1:length(summary) 
     criteria = and(summary(i).bool_kept, summary(i).bool_kept);
     [summary(i).N,summary(i).edges] = histcounts(summary(i).dcoef(criteria), 10,'BinLimits', [min max]);
@@ -264,3 +274,4 @@ names = {'dCas9';'no ATP';'ADP'; 'ATP'; 'ATP gammaS'; ' '};
 set(gca,'xtick',[1:6],'xticklabel',names)
 ylim([0 100])
 title('Panel E')
+clearvars -except summary

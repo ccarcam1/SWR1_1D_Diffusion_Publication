@@ -98,11 +98,11 @@ ylim([0 y_upperlim])
 xlim([0 2])
 
 %% (Panel B) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure('Name', 'Panel B')
 
+figure('Name', 'Panel B')
 xy = {};
 clearvars -except summary
-for i = [3, 14, 12]
+for i = [3, 14, 12] % 
     if i == 3
         coloris = 'red';
     elseif i == 14
@@ -115,21 +115,11 @@ for i = [3, 14, 12]
     trackkept = summary(i).tracking(and(summary(i).bool_kept, summary(i).outlier_exclusion));
     linetimeskept = summary(i).line_time(and(summary(i).bool_kept, summary(i).outlier_exclusion));
     tempval = cellfun(@length, trackkept);
-    for j = 1:length(linetimeskept)
-    lengthtime(j) = tempval(j)*linetimeskept(j)/1000;
-    end
-    tracks = {};
-    line_time = [];
-    tracks = trackkept(lengthtime>8);
-    line_time = linetimeskept(lengthtime>8);
-    % Seed the random number generator
-    rng(4)
-    randis = randperm(length(tracks));
-    for j = 1:10
-    plot(tracks{randis(j)}(:,1)*line_time(randis(j))/1000, (tracks{randis(j)}(:,2)-tracks{randis(j)}(1,2))*0.1, coloris)
+    for j = 1:length(trackkept)
+    plot(trackkept{j}(:,1)*linetimeskept(j)/1000, (trackkept{j}(:,2)-trackkept{j}(1,2))*0.1, coloris, 'LineWidth', 0.2)
     x = []; y = [];
-    x = tracks{randis(j)}(:,1)*line_time(randis(j))/1000;
-    y = (tracks{randis(j)}(:,2)-tracks{randis(j)}(1,2))*0.1;
+    x = trackkept{j}(:,1)*linetimeskept(j)/1000;
+    y = (trackkept{j}(:,2)-trackkept{j}(1,2))*0.1;
     xy{i}{j} = [x(x<8), y(x<8)];
     hold on
 %     pause
@@ -139,8 +129,6 @@ for i = [3, 14, 12]
 end
 hold off 
 title('Figure 3: Panel B')
-
-
 %% (Panel C) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp(newline)
 % Part 1: Exclusion and Outlier Criteria Data refinement

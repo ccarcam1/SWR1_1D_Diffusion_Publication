@@ -1,4 +1,8 @@
-%% Figure 2 (Panel C) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figure 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Open the following datasets:
+% All Diffusion Dataset (variable name: summary)
+
+%% (Panel C) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc 
 close all
 figure('Name', 'Panel C')

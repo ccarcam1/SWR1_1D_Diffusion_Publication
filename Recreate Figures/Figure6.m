@@ -1,4 +1,9 @@
 %% Figure 6 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Open the following datasets:
+% All Diffusion Dataset (variable name: summary)
+% Nucleosome Bypass Dataset(variable name: data)
+
+%%
 % find compaction ratio 
 clc
 clearvars -except data summary
@@ -89,8 +94,8 @@ disp(strcat('n = ', num2str(length(round((mean(fivepN_nuc_ret)-fivepN_all)/dista
 copypaste = [];
 copypaste = round((mean(fivepN_nuc_ret)-fivepN_all)/distance_per_nuc)';
 
-%% (Panel A) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure('Name', 'Panel A')
+%% (Panel D) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure('Name', 'Panel D')
 hold on
 n_is_unwrap = 0;
 n_is_retrac = 0;
@@ -275,7 +280,7 @@ disp(strcat(summary(i).condition, ' has n = ', num2str(n), ' molecules',...
     ' and has an alpha of =', num2str(fit_plot.alpha)))
 end
 legend off
-title('Figure 3: Panel X')
+title('Figure 3: Panel F')
 y_upperlim = 0.126258+0.0189;
 ylim([0 y_upperlim])
 xlim([0 2])
@@ -366,7 +371,7 @@ end
 xlim([0 2])
 
 
-%% Main figure Panel X
+%% Main figure Panel F
 
 space = 3;
 longest = 400;   %400 for SWR1 on nuc array

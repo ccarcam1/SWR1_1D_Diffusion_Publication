@@ -1,3 +1,7 @@
+%% Figure 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Open the following datasets:
+% All Diffusion Dataset (variable name: summary)
+
 %% Panel A
 clearvars -except summary
 close all

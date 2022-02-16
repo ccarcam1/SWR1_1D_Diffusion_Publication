@@ -1,4 +1,8 @@
-%% Figure 3 (PANEL A)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figure 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Open the following datasets:
+% All Diffusion Dataset (variable name: summary)
+
+%% (PANEL A)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First open data structure, with variable name "summary"
 close all
 clearvars -except summary

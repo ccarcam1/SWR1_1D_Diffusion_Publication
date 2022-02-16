@@ -1,7 +1,14 @@
+%% Figure 5 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Open the following datasets:
+% All Diffusion Dataset (variable name: summary)
+% dCas9 Bypass Dataset (variable name: corr)
+
+%% Reproduce the pie-chart
+
 clearvars -except summary corr 
 clc
 close all
-figure('Name', 'Panel D')
+figure('Name', 'Panel C')
 
 % The message section is where I separate colocalized traces into either:
 % 1: Stuck (Immobile)
